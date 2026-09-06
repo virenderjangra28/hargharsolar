@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const BILL_OPTIONS = [
   "Less than ₹1500",
@@ -19,6 +20,7 @@ const EMPTY = {
 };
 
 export default function ExpertPopup({ open, onClose }) {
+  const router = useRouter();
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -59,6 +61,9 @@ export default function ExpertPopup({ open, onClose }) {
   function handleSubmit(event) {
     event.preventDefault();
     if (!validate()) return;
+    const firstName = form.name.trim().split(/\s+/)[0];
+    onClose();
+    router.push(`/welcome?name=${encodeURIComponent(firstName)}`);
     setSubmitted(true);
   }
 
