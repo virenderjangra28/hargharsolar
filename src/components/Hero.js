@@ -62,7 +62,7 @@ export default function Hero() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20" />
       </div>
 
-      <div className="relative mx-auto grid max-w-6xl items-start gap-8 px-4 py-8 sm:gap-10 sm:px-6 md:grid-cols-2 md:px-8 md:py-10 lg:min-h-[640px] lg:grid-cols-[1.05fr_0.95fr] lg:py-16">
+      <div className="relative mx-auto grid max-w-site items-start gap-8 px-4 py-8 sm:gap-10 sm:px-6 md:grid-cols-2 md:px-8 md:py-10 lg:min-h-[640px] lg:grid-cols-[1.05fr_0.95fr] lg:py-16">
         <div className="text-white">
           <h1 className="max-w-xl text-[28px] font-extrabold leading-[1.2] tracking-tight text-pretty sm:text-4xl md:text-[40px] lg:text-[56px]">
             Go Solar At Zero Investment!

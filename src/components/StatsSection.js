@@ -42,7 +42,7 @@ const STATS = [
 export default function StatsSection() {
   return (
     <section className="bg-white px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-20">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-site">
         <h2 className="text-center text-2xl font-extrabold tracking-tight text-navy sm:text-3xl md:text-4xl">
           Powering Homes Across India
         </h2>

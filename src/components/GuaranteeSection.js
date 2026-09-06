@@ -63,7 +63,7 @@ export default function GuaranteeSection() {
       id="guarantee"
       className="bg-gradient-to-b from-sky-soft via-[#f3f9fd] to-white px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-20"
     >
-      <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2 md:gap-12">
+      <div className="mx-auto grid max-w-site items-center gap-10 md:grid-cols-2 md:gap-12">
         <div>
           <h2 className="text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
                 <div className="text-navy-deep mb-2 block text-[32px] font-semibold leading-tight">Introducing</div>

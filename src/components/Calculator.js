@@ -44,7 +44,7 @@ export default function Calculator() {
 
   return (
     <section id="calculator" className="bg-navy-deep px-4 py-12 text-white sm:px-6 sm:py-16 md:px-8 md:py-20">
-      <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2 md:gap-12">
+      <div className="mx-auto grid max-w-site items-center gap-10 md:grid-cols-2 md:gap-12">
         <div>
           <h2 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
             Go Solar with Zero Investment

@@ -1,11 +1,20 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import Logo from "./../../public/images/logo.png";
 import Image from "next/image";
 
 export default function Header() {
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/login")) {
+    return null;
+  }
+
   return (
     <>
       <header className="fixed top-0 right-0 left-0 z-40 border-b border-slate-100 bg-white/95 shadow-sm backdrop-blur-sm">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-start px-4 sm:h-16 sm:px-6 md:h-[72px] md:px-8">
+        <div className="mx-auto flex h-14 max-w-site items-center justify-start px-4 sm:h-16 sm:px-6 md:h-[72px] md:px-8">
           <a href="/" aria-label="HarGharSolar home">
             <Image
               src={Logo}

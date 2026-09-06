@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useExpertModal } from "@/components/ExpertModalContext";
 
 const HARYANA_CITIES = [
@@ -32,11 +33,16 @@ const LEGAL_LINKS = [
 ];
 
 export default function Footer() {
+  const pathname = usePathname();
   const { openModal } = useExpertModal();
+
+  if (pathname.startsWith("/admin") || pathname.startsWith("/login")) {
+    return null;
+  }
 
   return (
     <footer className="bg-navy-deep px-4 py-10 text-white sm:px-6 sm:py-12 md:px-8 md:py-14">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-site">
         <p className="text-sm font-bold uppercase tracking-wide">Haryana</p>
         <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-2.5 md:grid-cols-4 lg:grid-cols-6">
           {HARYANA_CITIES.map((city) => (

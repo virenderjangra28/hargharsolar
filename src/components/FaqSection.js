@@ -154,7 +154,7 @@ export default function FaqSection() {
 
   return (
     <section id="faq" className="bg-white px-4 py-12 sm:px-6 sm:py-16 md:px-8 md:py-20">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-site">
         <span className="inline-flex rounded-full bg-navy px-4 py-1.5 text-sm font-medium text-white">
           Frequently Asked Questions
         </span>
