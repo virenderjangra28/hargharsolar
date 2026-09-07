@@ -2,30 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useExpertModal } from "@/components/ExpertModalContext";
-
-const HARYANA_CITIES = [
-  "Gurugram",
-  "Faridabad",
-  "Panchkula",
-  "Ambala",
-  "Panipat",
-  "Karnal",
-  "Rohtak",
-  "Hisar",
-  "Sonipat",
-  "Yamunanagar",
-  "Rewari",
-  "Bhiwani",
-  "Sirsa",
-  "Jind",
-  "Kaithal",
-  "Kurukshetra",
-  "Palwal",
-  "Jhajjar",
-  "Fatehabad",
-  "Bahadurgarh",
-];
-
+import { HARYANA_CITIES } from "./haryanaCities";
 const LEGAL_LINKS = [
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Terms of Service", href: "/terms" },

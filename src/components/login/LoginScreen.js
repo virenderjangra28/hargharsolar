@@ -32,23 +32,36 @@ export default function LoginScreen() {
     return Object.keys(next).length === 0;
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     if (!validate()) return;
 
-    const emailMatch = form.email.trim().toLowerCase() === ADMIN_USER.email;
-    const passwordMatch = form.password === ADMIN_USER.password;
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: form.email, password: form.password }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        setErrors({ form: data.error || "Email or password is incorrect." });
+        return;
+      }
 
-    if (!emailMatch || !passwordMatch) {
-      setErrors({ form: "Email or password is incorrect." });
-      return;
+      window.sessionStorage.setItem(
+        ADMIN_AUTH_KEY,
+        JSON.stringify({
+          email: data.user?.email || form.email,
+          name: data.user?.name || ADMIN_USER.name,
+          token: data.token,
+        }),
+      );
+      router.push("/admin/dashboard");
+    } catch (error) {
+      setErrors({ form: "Unable to login. Please try again." });
     }
-
-    window.sessionStorage.setItem(
-      ADMIN_AUTH_KEY,
-      JSON.stringify({ email: ADMIN_USER.email, name: ADMIN_USER.name }),
-    );
-    router.push("/admin/dashboard");
   }
 
   return (
