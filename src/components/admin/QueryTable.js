@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useAdminRequests } from "./AdminRequestContext";
+import { useEffect, useMemo, useRef, useState } from "react";
 import QueryDetail from "./QueryDetail";
 import { ACTIONS, actionClass, filterRequests, formatDate, StatusBadge } from "./queryFields";
+
+function rowId(row) {
+  return String(row?._id ?? row?.id ?? "");
+}
 
 const PAGE_SIZES = [5, 10, 20, 40, 60, 100];
 
@@ -26,14 +29,33 @@ function pageNumbers(current, total) {
     }, []);
 }
 
-export default function QueryTable({ filterStatus, editable = true }) {
-  const { requests, setStatus } = useAdminRequests();
+export default function QueryTable({ filterStatus = "", editable = true }) {
+  const initialize = useRef(false);
+  const [requests, setRequests] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [pageSize, setPageSize] = useState(5);
   const [page, setPage] = useState(1);
 
+  const filterData = async () => {
+    try {
+      const response = await fetch("/api/filter-query", {
+        method: "POST",
+        body: JSON.stringify({ status: filterStatus }),
+      });
+      const data = await response.json();
+      setRequests(data.data);
+    } catch (error) {
+      console.error("Error filtering data:", error);
+      return [];
+    }
+  }
+
   useEffect(() => {
     setPage(1);
+    if(!initialize.current) {
+      initialize.current = true;
+      filterData();
+    }
   }, [filterStatus]);
 
   const filtered = useMemo(
@@ -48,13 +70,29 @@ export default function QueryTable({ filterStatus, editable = true }) {
     () => filtered.slice(start, start + pageSize),
     [filtered, start, pageSize],
   );
-  const selected = filtered.find((row) => row.id === selectedId) ?? null;
+  const selected = filtered.find((row) => rowId(row) === String(selectedId)) ?? null;
   const from = total === 0 ? 0 : start + 1;
   const to = Math.min(start + pageSize, total);
 
   function changePageSize(value) {
     setPageSize(value);
     setPage(1);
+  }
+
+  async function setStatus(id, status) {
+    const nextId = String(id);
+    setRequests((prev) =>
+      prev.map((item) => (rowId(item) === nextId ? { ...item, status } : item)),
+    );
+    try {
+      await fetch("/api/query", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: nextId, status }),
+      });
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
   }
 
   return (
@@ -74,28 +112,28 @@ export default function QueryTable({ filterStatus, editable = true }) {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
-              <tr key={row.id} className="border-t border-line align-top">
+            {rows.map((row, index) => (
+              <tr key={index} className="border-t border-line align-top">
                 <td className="px-4 py-3">
                   <button
                     type="button"
-                    onClick={() => setSelectedId(row.id)}
+                    onClick={() => setSelectedId(rowId(row))}
                     className="font-semibold text-navy underline-offset-2 hover:underline"
                   >
                     {row.name}
                   </button>
                 </td>
                 <td className="max-w-[220px] px-4 py-3 text-ink/80">{row.address}</td>
-                <td className="px-4 py-3">{row.ownership}</td>
+                <td className="px-4 py-3">{row.propertyType}</td>
                 <td className="whitespace-nowrap px-4 py-3">{row.monthlyBill}</td>
-                <td className="px-4 py-3">{row.pincode}</td>
-                <td className="whitespace-nowrap px-4 py-3">{formatDate(row.date)}</td>
-                <td className="whitespace-nowrap px-4 py-3">{row.timeSlot}</td>
+                <td className="px-4 py-3">{row.pinCode}</td>
+                <td className="whitespace-nowrap px-4 py-3">{formatDate(row.selectedDate)}</td>
+                <td className="whitespace-nowrap px-4 py-3">{row.selectedTime}</td>
                 <td className="px-4 py-3">
                   {editable ? (
                     <select
                       value={row.status}
-                      onChange={(event) => setStatus(row.id, event.target.value)}
+                      onChange={(event) => setStatus(rowId(row), event.target.value)}
                       aria-label={`Update status for ${row.name}`}
                       className={`min-w-[130px] rounded-lg border px-2.5 py-1.5 text-xs font-semibold outline-none focus:ring-2 focus:ring-sky/30 ${actionClass(
                         row.status,

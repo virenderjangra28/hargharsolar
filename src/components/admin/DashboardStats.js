@@ -2,7 +2,7 @@
 
 import StatCard from "./StatCard";
 import { useAdminRequests } from "./AdminRequestContext";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function percentOf(value, total) {
   if (!total) return 0;
@@ -10,21 +10,33 @@ function percentOf(value, total) {
 }
 
 export default function DashboardStats() {
-  const { stats } = useAdminRequests();
+  // const { stats } = useAdminRequests();
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    accepted: 0,
+    rejected: 0,
+  });
   const initilize = useRef(false);
 
   const dashboardData = async () => {
     try {
       const response = await fetch("/api/query");
       const data = await response.json();
-      return data;
+      setStats({
+        total: data.counts.total,
+        pending: data.counts.pending,
+        accepted: data.counts.accepted,
+        rejected: data.counts.rejected,
+      });
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
-      return {
+      setStats({
         total: 0,
         pending: 0,
-        resolved: 0,
-      };
+        accepted: 0,  
+        rejected: 0,
+      });
     }
   }
 
@@ -66,11 +78,11 @@ export default function DashboardStats() {
         }
       />
       <StatCard
-        href="/admin/resolved"
+        href="/admin/accepted"
         label="Completed"
-        value={stats.resolved}
+        value={stats.accepted}
         hint={`${stats.accepted} accepted · ${stats.rejected} rejected`}
-        percent={percentOf(stats.resolved, stats.total)}
+        percent={percentOf(stats.accepted, stats.total)}
         accent={{ strong: "#16a34a", soft: "#e4f7ea" }}
         icon={
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">

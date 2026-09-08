@@ -75,6 +75,7 @@ export default function SavingsQuiz({ lead = {} }) {
   const [visit, setVisit] = useState({
     name: data?.name || "",
     phone: data?.phone || "",
+    rent: roof,
     address: "",
     landmark: "",
     pincode: data?.pincode || "",

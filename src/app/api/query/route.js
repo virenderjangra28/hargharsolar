@@ -48,3 +48,20 @@ export async function GET() {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
+
+export async function PATCH(request) {
+  try {
+    await connectDB();
+    const { id, status } = await request.json();
+    if (!id || !["pending", "accepted", "rejected"].includes(status)) {
+      return NextResponse.json({ success: false, error: "Invalid id or status" }, { status: 400 });
+    }
+    const updated = await QueryList.findByIdAndUpdate(id, { status }, { new: true });
+    if (!updated) {
+      return NextResponse.json({ success: false, error: "Query not found" }, { status: 404 });
+    }
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}

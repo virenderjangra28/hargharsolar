@@ -5,14 +5,14 @@ import { ACTIONS, actionClass, actionLabel, formatDate, StatusBadge } from "./qu
 
 const DETAIL_FIELDS = [
   { key: "name", label: "Name" },
-  { key: "phone", label: "WhatsApp" },
+  { key: "mobile", fallback: "phone", label: "WhatsApp" },
   { key: "address", label: "Address" },
   { key: "landmark", label: "Landmark" },
-  { key: "ownership", label: "Ownership" },
+  { key: "propertyType", fallback: "ownership", label: "Ownership" },
   { key: "monthlyBill", label: "Monthly bill" },
-  { key: "pincode", label: "PIN code" },
-  { key: "date", label: "Selected date", format: formatDate },
-  { key: "timeSlot", label: "Time slot" },
+  { key: "pinCode", fallback: "pincode", label: "PIN code" },
+  { key: "selectedDate", fallback: "date", label: "Selected date", format: formatDate },
+  { key: "selectedTime", fallback: "timeSlot", label: "Time slot" },
 ];
 
 export default function QueryDetail({ request, onClose, setStatus, editable = true }) {
@@ -66,7 +66,7 @@ export default function QueryDetail({ request, onClose, setStatus, editable = tr
         <div className="overflow-y-auto px-5 py-4">
           <dl className="divide-y divide-line rounded-xl border border-line">
             {DETAIL_FIELDS.map((field) => {
-              const raw = request[field.key];
+              const raw = request[field.key] ?? request[field.fallback];
               const value = field.format ? field.format(raw) : raw;
               return (
                 <div key={field.key} className="grid grid-cols-[140px_1fr] gap-3 px-4 py-3 text-sm">
@@ -84,7 +84,7 @@ export default function QueryDetail({ request, onClose, setStatus, editable = tr
                   <>
                     <select
                       value={request.status}
-                      onChange={(event) => setStatus(request.id, event.target.value)}
+                      onChange={(event) => setStatus(request._id ?? request.id, event.target.value)}
                       aria-label={`Update status for ${request.name}`}
                       className={`min-w-[130px] rounded-lg border px-2.5 py-1.5 text-xs font-semibold outline-none focus:ring-2 focus:ring-sky/30 ${actionClass(
                         request.status,

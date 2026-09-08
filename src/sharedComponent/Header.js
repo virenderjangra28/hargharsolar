@@ -50,8 +50,8 @@ const SOLUTIONS = [
 
 const MORE = [
   { label: "Solar Calculator", href: "/solar-calculator" },
-  { label: "PM Surya Ghar Yojana", href: "/terms" },
-  { label: "Refer & Earn", href: "/terms" },
+  { label: "PM Surya Ghar Yojana", href: "/pm-surya-ghar-yojana" },
+  { label: "Refer & Earn", href: "/refer-and-earn" },
 ];
 
 function Chevron({ open }) {
