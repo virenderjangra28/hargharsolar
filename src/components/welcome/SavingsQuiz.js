@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useExpertModal } from "@/components/ExpertModalContext";
+import { toast } from "react-toastify";
 
 const ROOF_OPTIONS = [
   {
@@ -65,20 +66,24 @@ function todayIso() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export default function SavingsQuiz() {
+export default function SavingsQuiz({ lead = {} }) {
   const { openModal } = useExpertModal();
+  const data = JSON.parse(decodeURIComponent(lead));
   const [step, setStep] = useState(1);
   const [roof, setRoof] = useState("");
-  const [bill, setBill] = useState("");
+  const [bill, setBill] = useState(data.bill || "");
   const [visit, setVisit] = useState({
+    name: data?.name || "",
+    phone: data?.phone || "",
     address: "",
     landmark: "",
-    pincode: "",
+    pincode: data?.pincode || "",
     date: "",
     slot: "",
   });
   const [visitErrors, setVisitErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const progress = step === 1 ? 18 : step === 2 ? 45 : submitted ? 100 : 80;
   const pinCity = PIN_CITIES[visit.pincode];
 
@@ -87,7 +92,7 @@ export default function SavingsQuiz() {
     setVisitErrors((prev) => ({ ...prev, [field]: "" }));
   }
 
-  function submitVisit(event) {
+  async function submitVisit(event) {
     event.preventDefault();
     const next = {};
     if (!visit.address.trim() || visit.address.trim().length < 8) {
@@ -103,7 +108,36 @@ export default function SavingsQuiz() {
       next.slot = "Select a time slot.";
     }
     setVisitErrors(next);
-    if (Object.keys(next).length === 0) setSubmitted(true);
+    setSubmitError("");
+    if (Object.keys(next).length > 0) return;
+
+    try {
+      const response = await fetch("/api/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: visit.name || "",
+          mobile: visit.phone || "",
+          monthlyBill: bill,
+          pinCode: visit.pincode,
+          propertyType: roof,
+          address: visit.address.trim(),
+          landmark: visit.landmark.trim(),
+          selectedDate: visit.date,
+          selectedTime: visit.slot,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setSubmitError(data.error || "Could not book the visit. Please try again.");
+        return;
+      }
+      setSubmitted(true);
+      toast.success("Your request has been submitted successfully. Our expert will contact you shortly.");
+    } catch {
+      setSubmitError("Could not book the visit. Please try again.");
+      toast.error("Could not book the visit. Please try again.");
+    }
   }
 
   return (
@@ -281,6 +315,8 @@ export default function SavingsQuiz() {
               </label>
             </div>
 
+            {submitError ? <p className="mt-3 text-sm text-red-600">{submitError}</p> : null}
+
             <button
               type="submit"
               className="mt-6 h-12 w-full rounded-xl bg-[#8b95a5] text-sm font-semibold text-white transition hover:bg-navy"
@@ -304,13 +340,13 @@ export default function SavingsQuiz() {
               Our expert will visit on {visit.date} between {visit.slot}. We will confirm on
               WhatsApp shortly.
             </p>
-            <button
+            {/* <button
               type="button"
               onClick={openModal}
               className="mt-6 inline-flex min-h-12 items-center rounded-lg bg-navy px-6 text-sm font-semibold text-white hover:bg-navy-mid"
             >
               Talk to our expert
-            </button>
+            </button> */}
           </div>
         ) : null}
       </div>

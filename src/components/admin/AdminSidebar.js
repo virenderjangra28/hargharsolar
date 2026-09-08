@@ -74,8 +74,9 @@ export default function AdminSidebar() {
     setOpen(false);
   }, [pathname]);
 
-  function logout() {
+  async function logout() {
     window.sessionStorage.removeItem(ADMIN_AUTH_KEY);
+    await fetch("/api/logout", { method: "POST" });
     router.push("/login");
   }
 

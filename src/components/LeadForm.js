@@ -55,7 +55,10 @@ export default function LeadForm() {
     event.preventDefault();
     if (!validate()) return;
     const firstName = form.name.trim().split(/\s+/)[0];
-    router.push(`/welcome?name=${encodeURIComponent(firstName)}`);
+    const queryParam = JSON.stringify(form);
+    // router.push(`/welcome?name=${encodeURIComponent(firstName)}`);
+    router.push(`/welcome?queryParams=${encodeURIComponent(JSON.stringify(queryParam))}`);
+
     setSubmitted(true);
   }
 

@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/sharedComponent/Header";
 import Footer from "@/sharedComponent/Footer";
 import { ExpertModalProvider } from "@/components/ExpertModalContext";
+import { ToastContainer } from "react-toastify";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -25,11 +26,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${plusJakarta.variable} h-full antialiased`}>
       <body className="min-h-full bg-white font-sans text-ink">
-        <ExpertModalProvider>
-          <Header />
-          {children}
-          <Footer />
-        </ExpertModalProvider>
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+          <ExpertModalProvider>
+            <Header />
+            {children}
+            <Footer />
+          </ExpertModalProvider>
       </body>
     </html>
   );

@@ -2,6 +2,7 @@
 
 import StatCard from "./StatCard";
 import { useAdminRequests } from "./AdminRequestContext";
+import { useEffect, useRef } from "react";
 
 function percentOf(value, total) {
   if (!total) return 0;
@@ -10,6 +11,29 @@ function percentOf(value, total) {
 
 export default function DashboardStats() {
   const { stats } = useAdminRequests();
+  const initilize = useRef(false);
+
+  const dashboardData = async () => {
+    try {
+      const response = await fetch("/api/query");
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+      return {
+        total: 0,
+        pending: 0,
+        resolved: 0,
+      };
+    }
+  }
+
+  useEffect(() => {
+    if(!initilize.current) {
+      initilize.current = true;
+      dashboardData();
+    }
+  }, []);
 
   return (
     <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">

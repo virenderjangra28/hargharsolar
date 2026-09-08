@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import { User } from "@/lib/model/user";
+import { comparePassword, User } from "@/lib/model/user";
 
 export async function POST(request) {
   try {
@@ -19,17 +19,24 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: "User not found" }, { status: 404 });
     }
 
-    const isPasswordCorrect = await User.comparePassword(password, user.password);
+    const isPasswordCorrect = await comparePassword(password, user.password);
     if (!isPasswordCorrect) {
       return NextResponse.json({ success: false, error: "Invalid password" }, { status: 401 });
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       token,
       user: { id: user._id, name: user.name, email: user.email },
     });
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60,
+    });
+    return response;
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
