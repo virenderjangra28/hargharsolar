@@ -5,13 +5,13 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useExpertModal } from "@/components/ExpertModalContext";
 import Logo from "./../../public/images/logo.png";
-import { HARYANA_CITIES } from "./haryanaCities";
+import { HARYANA_CITIES, rooftopSolarPath } from "./haryanaCities";
 
 const OFFERINGS = [
-  { label: "Zero investment solar", href: "/#consult" },
-  { label: "Guaranteed savings", href: "/#guarantee" },
-  { label: "Hassle-free process", href: "/#why-us" },
-  { label: "After-sales service", href: "/#why-us" },
+  { label: "Zero investment solar", href: "/zero-investment" },
+  { label: "Guaranteed savings", href: "/guaranted-saving" },
+  // { label: "Hassle-free process", href: "/#why-us" },
+  // { label: "After-sales service", href: "/#why-us" },
 ];
 
 function OnGridIcon() {
@@ -44,8 +44,8 @@ function OffGridIcon() {
 }
 
 const SOLUTIONS = [
-  { label: "On-Grid Solar", href: "/#top", icon: <OnGridIcon /> },
-  { label: "Off-Grid Solar", href: "/#calculator", icon: <OffGridIcon /> },
+  { label: "On-Grid Solar", href: "/on-grid-solar", icon: <OnGridIcon /> },
+  { label: "Off-Grid Solar", href: "/off-grid-solar", icon: <OffGridIcon /> },
 ];
 
 const MORE = [
@@ -171,14 +171,13 @@ export default function Header() {
                 <Dropdown id="cities-menu" label="Cities">
                   <div className="grid max-h-72 grid-cols-2 gap-x-2 overflow-y-auto">
                     {HARYANA_CITIES.map((city) => (
-                      <button
+                      <a
                         key={city}
-                        type="button"
-                        onClick={quote}
+                        href={rooftopSolarPath(city)}
                         className="px-4 py-2 text-left text-sm text-navy hover:bg-sky-soft"
                       >
                         {city}
-                      </button>
+                      </a>
                     ))}
                   </div>
                 </Dropdown>
@@ -277,14 +276,13 @@ export default function Header() {
                 {openMenu === "cities" ? (
                   <div className="grid grid-cols-2 gap-x-3 pb-2 pl-2">
                     {HARYANA_CITIES.map((city) => (
-                      <button
+                      <a
                         key={city}
-                        type="button"
-                        onClick={quote}
+                        href={rooftopSolarPath(city)}
                         className="py-2 text-left text-sm text-muted"
                       >
                         {city}
-                      </button>
+                      </a>
                     ))}
                   </div>
                 ) : null}

@@ -1,6 +1,4 @@
-"use client";
-
-import { useExpertModal } from "./ExpertModalContext";
+import Link from "next/link";
 
 const FEATURES = [
   {
@@ -56,8 +54,6 @@ const FEATURES = [
 ];
 
 export default function GuaranteeSection() {
-  const { openModal } = useExpertModal();
-
   return (
     <section
       id="guarantee"
@@ -72,13 +68,12 @@ export default function GuaranteeSection() {
           <p className="mt-3 text-base text-muted sm:text-lg">
             India&apos;s Guaranteed Solar Savings Plan
           </p>
-          <button
-            type="button"
-            onClick={openModal}
+          <Link
+            href="/guaranted-saving"
             className="mt-6 inline-flex min-h-12 items-center rounded-lg bg-navy px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-navy-mid sm:mt-8"
           >
             Know More about HarGharZero
-          </button>
+          </Link>
         </div>
 
         <div className="grid gap-8 sm:grid-cols-2">

@@ -41,10 +41,11 @@ export default function SolarCalculator() {
   const [showBillInfo, setShowBillInfo] = useState(false);
   const pinCity = PIN_CITIES[pincode];
   const [zone, setZone] = useState(null);
+  const [zoneName, setZoneName] = useState("");
   const percent = ((bill - MIN_BILL) / (MAX_BILL - MIN_BILL)) * 100;
 
   const result = useMemo(() => {
-    const kw = (bill / MIN_BILL) * 2.16;
+    const kw = (bill / MIN_BILL) * 0.5;
     const roof = kw * SQFT_PER_KW;
     const monthly = kw * SUN_HOURS * DAYS * TARIFF;
     const yearly = monthly * 12;
@@ -62,6 +63,8 @@ export default function SolarCalculator() {
       return;
     }
     try {
+      setZoneName("");
+      setBill(MIN_BILL);
       const response  = await fetch(`https://api.postalpincode.in/pincode/${value}`);
       const data = await response.json();
       // console.log(data);
@@ -116,8 +119,9 @@ export default function SolarCalculator() {
                   }
                   className="h-12 min-w-[140px] flex-1 rounded-lg border border-line bg-white px-4 text-base text-ink outline-none placeholder:text-slate-400 focus:border-navy"
                 />
-                <select className="h-12 min-w-[140px] flex-1 rounded-lg border border-line bg-white px-4 text-base text-ink outline-none focus:border-navy">
-                  <option value="">Select city</option>
+                <select className="h-12 min-w-[140px] flex-1 rounded-lg border border-line bg-white px-4 text-base text-ink outline-none focus:border-navy" 
+                onChange={(event) => setZoneName(event.target.value)}>
+                  <option value="">Select zone</option>
                   {zone?.map((item) => (
                     <option key={item.Name} value={item.Name}>
                       {item.Name}
@@ -153,6 +157,7 @@ export default function SolarCalculator() {
               <div className="relative mt-8 px-2 pb-10">
                 <input
                   type="range"
+                  disabled = {zoneName === ""}
                   min={MIN_BILL}
                   max={MAX_BILL}
                   step={50}

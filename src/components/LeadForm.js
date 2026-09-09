@@ -19,7 +19,17 @@ const EMPTY = {
   consent: true,
 };
 
-export default function LeadForm() {
+export default function LeadForm({
+  variant = "default",
+  title,
+  subtitle,
+  showSlotsBadge = false,
+  submitLabel,
+}) {
+  const heading = title ?? "Book a FREE Solar Consultation";
+  const lead = subtitle === undefined ? "And save up to ₹1,00,000 with subsidy" : subtitle;
+  const isSidebar = variant === "sidebar";
+  const isCity = variant === "city";
   const router = useRouter();
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
@@ -38,7 +48,7 @@ export default function LeadForm() {
     if (!/^[6-9]\d{9}$/.test(form.phone.trim())) {
       next.phone = "Enter a valid 10-digit WhatsApp number.";
     }
-    if (!form.bill) {
+    if (!isCity && !form.bill) {
       next.bill = "Select your monthly electricity bill.";
     }
     if (!/^\d{6}$/.test(form.pincode.trim())) {
@@ -98,15 +108,26 @@ export default function LeadForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl bg-white p-5 shadow-[0_18px_50px_rgba(16,36,72,0.16)] sm:p-6 md:p-8"
+      className={
+        isCity
+          ? "rounded-2xl bg-[#1a1a1a] p-5 text-white shadow-xl sm:p-6"
+          : isSidebar
+            ? "bg-transparent p-1 sm:p-2"
+            : "rounded-2xl bg-white p-5 shadow-[0_18px_50px_rgba(16,36,72,0.16)] sm:p-6 md:p-8"
+      }
       noValidate
     >
-      <h2 className="text-center text-[22px] font-extrabold leading-tight text-navy sm:text-[26px]">
-        Book a FREE Solar Consultation
+      <h2
+        className={`text-center text-[22px] font-extrabold leading-tight sm:text-[26px] ${
+          isCity ? "text-white" : "text-navy"
+        }`}
+      >
+        {heading}
       </h2>
-      <p className="mt-1 text-center text-sm text-muted">
-        And save up to ₹1,00,000 with subsidy
-      </p>
+      {isCity ? <div className="mx-auto mt-3 h-0.5 w-16 bg-sky" /> : null}
+      {lead ? (
+        <p className={`mt-1 text-center text-sm ${isCity ? "text-white/70" : "text-muted"}`}>{lead}</p>
+      ) : null}
 
       <label className="mt-6 block">
         <span className="sr-only">Full Name</span>
@@ -138,6 +159,7 @@ export default function LeadForm() {
         {errors.phone ? <p className="mt-1 text-xs text-red-600">{errors.phone}</p> : null}
       </label>
 
+      {isCity ? null : (
       <fieldset className="mt-5">
         <legend className="mb-2.5 text-sm font-semibold text-ink">
           Monthly electricity bill?
@@ -163,6 +185,7 @@ export default function LeadForm() {
         </div>
         {errors.bill ? <p className="mt-1 text-xs text-red-600">{errors.bill}</p> : null}
       </fieldset>
+      )}
 
       <label className="mt-5 block">
         <span className="sr-only">PIN Code</span>
@@ -181,7 +204,7 @@ export default function LeadForm() {
         ) : null}
       </label>
 
-      <label className="mt-4 flex items-start gap-2.5 text-[11px] leading-4 text-muted">
+      <label className={`mt-4 flex items-start gap-2.5 text-[11px] leading-4 ${isCity ? "text-white/60" : "text-muted"}`}>
         <input
           type="checkbox"
           checked={form.consent}
@@ -202,12 +225,21 @@ export default function LeadForm() {
       </label>
       {errors.consent ? <p className="mt-1 text-xs text-red-600">{errors.consent}</p> : null}
 
-      <button
-        type="submit"
-        className="mt-5 w-full rounded-lg bg-navy py-3.5 text-sm font-semibold text-white transition hover:bg-navy-mid"
-      >
-        Book a FREE Consultation
-      </button>
+      <div className="relative mt-5">
+        {showSlotsBadge ? (
+          <span className="absolute -top-3 right-3 z-10 rotate-6 rounded-sm bg-[#f5d000] px-2 py-0.5 text-[10px] font-extrabold text-navy">
+            Limited slots only!
+          </span>
+        ) : null}
+        <button
+          type="submit"
+          className={`w-full rounded-lg py-3.5 text-sm font-semibold text-white transition ${
+            isCity ? "bg-sky uppercase tracking-wide hover:bg-navy" : "bg-navy hover:bg-navy-mid"
+          }`}
+        >
+          {submitLabel ?? "Book a FREE Consultation"}
+        </button>
+      </div>
     </form>
   );
 }

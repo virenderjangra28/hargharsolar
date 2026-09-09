@@ -2,7 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import { useExpertModal } from "@/components/ExpertModalContext";
-import { HARYANA_CITIES } from "./haryanaCities";
+import { HARYANA_CITIES, rooftopSolarPath } from "./haryanaCities";
+import Link from "next/link";
 const LEGAL_LINKS = [
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Terms of Service", href: "/terms" },
@@ -24,13 +25,19 @@ export default function Footer() {
         <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-2.5 md:grid-cols-4 lg:grid-cols-6">
           {HARYANA_CITIES.map((city) => (
             <li key={city}>
-              <button
+              <Link
+                href={rooftopSolarPath(city)}
+                className="min-h-10 text-left text-sm font-normal text-white/90 transition hover:text-white"
+              >
+                {city}
+              </Link>
+              {/* <button
                 type="button"
                 onClick={openModal}
                 className="min-h-10 text-left text-sm font-normal text-white/90 transition hover:text-white"
               >
                 {city}
-              </button>
+              </button> */}
             </li>
           ))}
         </ul>

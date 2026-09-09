@@ -20,3 +20,14 @@ export const HARYANA_CITIES = [
   "Fatehabad",
   "Bahadurgarh",
 ];
+
+export function cityFromRooftopSlug(slug) {
+  const key = String(slug || "")
+    .replace(/^rooftop-solar-/, "")
+    .toLowerCase();
+  return HARYANA_CITIES.find((city) => city.toLowerCase() === key) || null;
+}
+
+export function rooftopSolarPath(city) {
+  return `/rooftop-solar-${city.toLowerCase()}`;
+}
