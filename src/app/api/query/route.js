@@ -6,6 +6,10 @@ export async function POST(request) {
   try {
     await connectDB();
     const body = await request.json();
+    // const existing = await QueryList.findOne({ mobile: body.mobile });
+    // if (existing) {
+    //   return NextResponse.json({ success: false, error: "Query already exists" }, { status: 400 });
+    // }
     const queryList = new QueryList({
       name: body.name,
       mobile: body.mobile,

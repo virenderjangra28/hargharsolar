@@ -34,11 +34,39 @@ export default function LeadForm({
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [mobileExist, setMobileExist] = useState(false);
 
   function update(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
+    if(field === "phone" && value.length === 10){
+      checkMobileExist(value);
+    }
   }
+
+  //Check mobile number exist in DB or not
+   const checkMobileExist = async (mobile) => {
+      try {
+        const response = await fetch("/api/check-mobile-exist", {
+          method: "POST",
+          body: JSON.stringify({ mobile: mobile }),
+        });
+        const data = await response.json();
+        if(data.success){
+          setMobileExist(false);
+          return true;
+        } else if (data.success === false){
+          setErrors((prev) => ({ ...prev, phone: data.message }));
+          setMobileExist(true);
+          return false;
+        }
+      } catch (error) {
+        console.error(error);
+        setErrors((prev) => ({ ...prev, phone: "Something went wrong" }));
+        return false;
+      }
+   }
 
   function validate() {
     const next = {};
@@ -63,13 +91,24 @@ export default function LeadForm({
 
   function handleSubmit(event) {
     event.preventDefault();
+    setLoading(true);
+    if(mobileExist){
+      setErrors((prev) => ({ ...prev, phone: "Mobile number already exists. Please try with another number." }));
+      setLoading(false);
+      return;
+    }
+    
     if (!validate()) return;
     const firstName = form.name.trim().split(/\s+/)[0];
     const queryParam = JSON.stringify(form);
     // router.push(`/welcome?name=${encodeURIComponent(firstName)}`);
-    router.push(`/welcome?queryParams=${encodeURIComponent(JSON.stringify(queryParam))}`);
+    setTimeout(() => {
+      setLoading(false);
+      router.push(`/welcome?queryParams=${encodeURIComponent(JSON.stringify(queryParam))}`);
+    }, 3000);
+    
 
-    setSubmitted(true);
+    // setSubmitted(true);
   }
 
   if (submitted) {
@@ -232,12 +271,13 @@ export default function LeadForm({
           </span>
         ) : null}
         <button
+          disabled={loading}
           type="submit"
           className={`w-full rounded-lg py-3.5 text-sm font-semibold text-white transition ${
             isCity ? "bg-sky uppercase tracking-wide hover:bg-navy" : "bg-navy hover:bg-navy-mid"
           }`}
         >
-          {submitLabel ?? "Book a FREE Consultation"}
+          {loading ? "Loading..." : submitLabel ?? "Book a FREE Consultation"}
         </button>
       </div>
     </form>

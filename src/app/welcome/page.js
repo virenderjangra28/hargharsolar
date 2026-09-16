@@ -40,11 +40,11 @@ export default async function WelcomePage({ searchParams }) {
   return (
     <div className="min-h-full overflow-x-hidden bg-white">
       <main>
-        <div className="flex flex-wrap">
-          <div className="min-w-[320px] flex-1 basis-[520px]">
+        <div className="flex flex-col lg:flex-row">
+          <div className="min-w-0 flex-1">
             <WelcomeHero name={name} />
           </div>
-          <div className="min-w-[320px] flex-1 basis-[420px]">
+          <div className="min-w-0 flex-1">
             <SavingsQuiz lead={lead} />
           </div>
         </div>

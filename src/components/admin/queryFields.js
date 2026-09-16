@@ -46,3 +46,54 @@ export function requestTypeTitle(filterStatus) {
   if (label === key) return "Requests";
   return `${label} requests`;
 }
+
+export function normalizeSource(value) {
+  const key = String(value || "home").toLowerCase();
+  if (key === "commercial" || key === "housing-society") return key;
+  return "home";
+}
+
+export function sourceLabel(value) {
+  const key = normalizeSource(value);
+  if (key === "commercial") return "Commercial";
+  if (key === "housing-society") return "Housing Society";
+  return "Home";
+}
+
+export function sourcePatchUrl(source) {
+  if (source === "commercial") return "/api/commercial";
+  if (source === "housing-society") return "/api/housing-society";
+  return "/api/query";
+}
+
+export function tableColumns(source) {
+  if (source === "commercial") {
+    return [
+      { key: "name", label: "Name" },
+      { key: "companyName", label: "Company" },
+      { key: "city", label: "City" },
+      { key: "monthlyBill", label: "Monthly bill" },
+      { key: "pinCode", label: "PIN code" },
+      { key: "mobile", label: "WhatsApp" },
+    ];
+  }
+  if (source === "housing-society") {
+    return [
+      { key: "name", label: "Name" },
+      { key: "societyName", label: "Society" },
+      { key: "designation", label: "Designation" },
+      { key: "monthlyBill", label: "Monthly bill" },
+      { key: "pinCode", label: "PIN code" },
+      { key: "approvalBy", label: "AGM status" },
+    ];
+  }
+  return [
+    { key: "name", label: "Name" },
+    { key: "address", label: "Address" },
+    { key: "propertyType", label: "Ownership" },
+    { key: "monthlyBill", label: "Monthly bill" },
+    { key: "pinCode", label: "PIN code" },
+    { key: "selectedDate", label: "Selected date", format: formatDate },
+    { key: "selectedTime", label: "Time slot" },
+  ];
+}

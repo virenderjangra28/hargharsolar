@@ -8,6 +8,8 @@ import { ADMIN_AUTH_KEY, ADMIN_USER } from "./adminUser";
 const NAV_ITEMS = [
   { href: "/admin/dashboard", label: "Dashboard" },
   { href: "/admin/query", label: "Query" },
+  { href: "/admin/commercial", label: "Commercial" },
+  { href: "/admin/housing-society", label: "Housing Society" }
 ];
 
 function initials(name) {

@@ -19,8 +19,8 @@ const STEPS = [
 
 export default function JourneySection() {
   return (
-    <section className="flex flex-wrap bg-white">
-      <div className="min-w-[320px] flex-1 basis-[420px] px-5 py-10 sm:px-8 sm:py-12 md:px-10 md:py-14">
+    <section className="flex flex-col bg-white lg:flex-row">
+      <div className="min-w-0 flex-1 px-4 py-10 sm:px-8 sm:py-12 md:px-10 md:py-14">
         <div className="max-w-[520px]">
           <h2 className="text-[26px] font-extrabold leading-tight text-navy sm:text-[34px]">
             What to Expect in Your Solar Journey?
@@ -41,7 +41,7 @@ export default function JourneySection() {
         </div>
       </div>
 
-      <div className="min-w-[320px] flex-1 basis-[420px]">
+      <div className="min-w-0 flex-1">
         <img
           src="/images/welcome-expert-visit.png"
           alt="Solar expert explaining a rooftop plan to homeowners"

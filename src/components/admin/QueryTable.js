@@ -1,14 +1,33 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import QueryDetail from "./QueryDetail";
-import { ACTIONS, actionClass, filterRequests, formatDate, StatusBadge } from "./queryFields";
+import { ACTIONS, actionClass, filterRequests, StatusBadge, normalizeSource, sourcePatchUrl, tableColumns } from "./queryFields";
 
 function rowId(row) {
   return String(row?._id ?? row?.id ?? "");
 }
 
 const PAGE_SIZES = [5, 10, 20, 40, 60, 100];
+const requestCache = new Map();
+
+function fetchFiltered(status, source) {
+  const key = `${source}:${status || ""}`;
+  const existing = requestCache.get(key);
+  if (existing) return existing;
+
+  const request = fetch("/api/filter-query", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status, source }),
+  }).then((response) => response.json());
+
+  requestCache.set(key, request);
+  request.catch(() => {
+    if (requestCache.get(key) === request) requestCache.delete(key);
+  });
+  return request;
+}
 
 function pageNumbers(current, total) {
   if (total <= 7) {
@@ -29,34 +48,45 @@ function pageNumbers(current, total) {
     }, []);
 }
 
-export default function QueryTable({ filterStatus = "", editable = true }) {
-  const initialize = useRef(false);
-  const [requests, setRequests] = useState([]);
+export default function QueryTable({
+  filterStatus = "",
+  editable = true,
+  source = "home",
+  initialRequests,
+}) {
+  const leadSource = normalizeSource(source);
+  const columns = tableColumns(leadSource);
+  const hasInitial = Array.isArray(initialRequests);
+  const [requests, setRequests] = useState(() => initialRequests ?? []);
   const [selectedId, setSelectedId] = useState(null);
   const [pageSize, setPageSize] = useState(5);
   const [page, setPage] = useState(1);
 
-  const filterData = async () => {
-    try {
-      const response = await fetch("/api/filter-query", {
-        method: "POST",
-        body: JSON.stringify({ status: filterStatus }),
-      });
-      const data = await response.json();
-      setRequests(data.data);
-    } catch (error) {
-      console.error("Error filtering data:", error);
-      return [];
-    }
-  }
-
   useEffect(() => {
     setPage(1);
-    if(!initialize.current) {
-      initialize.current = true;
-      filterData();
+    setSelectedId(null);
+
+    if (hasInitial) {
+      setRequests(initialRequests);
+      return;
     }
-  }, [filterStatus]);
+
+    let cancelled = false;
+    fetchFiltered(filterStatus, leadSource)
+      .then((data) => {
+        if (cancelled) return;
+        setRequests(data.data || []);
+      })
+      .catch((error) => {
+        console.error("Error filtering data:", error);
+        if (cancelled) return;
+        setRequests([]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filterStatus, leadSource, hasInitial, initialRequests]);
 
   const filtered = useMemo(
     () => filterRequests(requests, filterStatus),
@@ -85,7 +115,7 @@ export default function QueryTable({ filterStatus = "", editable = true }) {
       prev.map((item) => (rowId(item) === nextId ? { ...item, status } : item)),
     );
     try {
-      await fetch("/api/query", {
+      await fetch(sourcePatchUrl(leadSource), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: nextId, status }),
@@ -101,34 +131,37 @@ export default function QueryTable({ filterStatus = "", editable = true }) {
         <table className="min-w-[980px] w-full text-left text-sm">
           <thead className="bg-[#f7fafc] text-xs font-semibold uppercase tracking-wide text-muted">
             <tr>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Address</th>
-              <th className="px-4 py-3">Ownership</th>
-              <th className="px-4 py-3">Monthly bill</th>
-              <th className="px-4 py-3">PIN code</th>
-              <th className="px-4 py-3">Selected date</th>
-              <th className="px-4 py-3">Time slot</th>
+              {columns.map((column) => (
+                <th key={column.key} className="px-4 py-3">{column.label}</th>
+              ))}
               <th className="px-4 py-3">{editable ? "Action" : "Status"}</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, index) => (
-              <tr key={index} className="border-t border-line align-top">
-                <td className="px-4 py-3">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedId(rowId(row))}
-                    className="font-semibold text-navy underline-offset-2 hover:underline"
-                  >
-                    {row.name}
-                  </button>
-                </td>
-                <td className="max-w-[220px] px-4 py-3 text-ink/80">{row.address}</td>
-                <td className="px-4 py-3">{row.propertyType}</td>
-                <td className="whitespace-nowrap px-4 py-3">{row.monthlyBill}</td>
-                <td className="px-4 py-3">{row.pinCode}</td>
-                <td className="whitespace-nowrap px-4 py-3">{formatDate(row.selectedDate)}</td>
-                <td className="whitespace-nowrap px-4 py-3">{row.selectedTime}</td>
+              <tr key={rowId(row) || index} className="border-t border-line align-top">
+                {columns.map((column) => {
+                  const raw = row[column.key];
+                  const value = column.format ? column.format(raw) : raw;
+                  if (column.key === "name") {
+                    return (
+                      <td key={column.key} className="px-4 py-3">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedId(rowId(row))}
+                          className="font-semibold text-navy underline-offset-2 hover:underline"
+                        >
+                          {row.name}
+                        </button>
+                      </td>
+                    );
+                  }
+                  return (
+                    <td key={column.key} className="max-w-[220px] px-4 py-3 text-ink/80">
+                      {value || "—"}
+                    </td>
+                  );
+                })}
                 <td className="px-4 py-3">
                   {editable ? (
                     <select
@@ -220,6 +253,7 @@ export default function QueryTable({ filterStatus = "", editable = true }) {
       {selected ? (
         <QueryDetail
           request={selected}
+          source={leadSource}
           setStatus={setStatus}
           editable={editable}
           onClose={() => setSelectedId(null)}

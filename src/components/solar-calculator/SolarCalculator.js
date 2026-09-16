@@ -4,27 +4,27 @@ import { useMemo, useState } from "react";
 import { useExpertModal } from "@/components/ExpertModalContext";
 
 const MIN_BILL = 500;
-const MAX_BILL = 10000;
+const MAX_BILL = 25000;
 const SQFT_PER_KW = 128 / 2.16;
 const SUN_HOURS = 4;
 const DAYS = 30;
 const TARIFF = 7.57;
 const LIFETIME_YEARS = 25;
 
-const PIN_CITIES = {
-  122001: "Gurugram",
-  122002: "Gurugram",
-  122003: "Gurugram",
-  121001: "Faridabad",
-  121002: "Faridabad",
-  134109: "Panchkula",
-  133001: "Ambala",
-  132103: "Panipat",
-  132001: "Karnal",
-  124001: "Rohtak",
-  125001: "Hisar",
-  131001: "Sonipat",
-};
+// const PIN_CITIES = {
+//   122001: "Gurugram",
+//   122002: "Gurugram",
+//   122003: "Gurugram",
+//   121001: "Faridabad",
+//   121002: "Faridabad",
+//   134109: "Panchkula",
+//   133001: "Ambala",
+//   132103: "Panipat",
+//   132001: "Karnal",
+//   124001: "Rohtak",
+//   125001: "Hisar",
+//   131001: "Sonipat",
+// };
 
 function formatInr(value) {
   return `₹${Math.round(value).toLocaleString("en-IN")}`;
@@ -39,10 +39,18 @@ export default function SolarCalculator() {
   const [pincode, setPincode] = useState("");
   const [bill, setBill] = useState(MIN_BILL);
   const [showBillInfo, setShowBillInfo] = useState(false);
-  const pinCity = PIN_CITIES[pincode];
+  // const pinCity = PIN_CITIES[pincode];
   const [zone, setZone] = useState(null);
   const [zoneName, setZoneName] = useState("");
-  const percent = ((bill - MIN_BILL) / (MAX_BILL - MIN_BILL)) * 100;
+  const sliderBill = Math.min(MAX_BILL, Math.max(MIN_BILL, Number(bill) || MIN_BILL));
+  const percent = ((sliderBill - MIN_BILL) / (MAX_BILL - MIN_BILL)) * 100;
+  const locationReady = pincode.length === 6 && zoneName !== "";
+
+  function clampSliderBill(value) {
+    const next = Number(value);
+    if (!Number.isFinite(next)) return MIN_BILL;
+    return Math.min(MAX_BILL, Math.max(MIN_BILL, Math.round(next)));
+  }
 
   const result = useMemo(() => {
     const kw = (bill / MIN_BILL) * 0.5;
@@ -117,14 +125,14 @@ export default function SolarCalculator() {
                   value={pincode}
                   onChange={(event) => searchZone(event.target.value)
                   }
-                  className="h-12 min-w-[140px] flex-1 rounded-lg border border-line bg-white px-4 text-base text-ink outline-none placeholder:text-slate-400 focus:border-navy"
+                  className="h-12 min-w-0 flex-1 rounded-lg border border-line bg-white px-4 text-base text-ink outline-none placeholder:text-slate-400 focus:border-navy"
                 />
-                <select className="h-12 min-w-[140px] flex-1 rounded-lg border border-line bg-white px-4 text-base text-ink outline-none focus:border-navy" 
+                <select className="h-12 min-w-0 flex-1 rounded-lg border border-line bg-white px-4 text-base text-ink outline-none focus:border-navy" 
                 onChange={(event) => setZoneName(event.target.value)}>
                   <option value="">Select zone</option>
                   {zone?.map((item) => (
                     <option key={item.Name} value={item.Name}>
-                      {item.Name}
+                      {item.Name.replace(/;/g, "")}
                     </option>
                   ))}
                 </select>
@@ -161,8 +169,8 @@ export default function SolarCalculator() {
                   min={MIN_BILL}
                   max={MAX_BILL}
                   step={50}
-                  value={bill}
-                  onChange={(event) => setBill(Number(event.target.value))}
+                  value={sliderBill}
+                  onChange={(event) => setBill(clampSliderBill(event.target.value))}
                   aria-label="Average electricity bill"
                   className="bill-slider h-1.5 w-full cursor-pointer appearance-none rounded-full bg-[#d9d9d9]"
                 />
@@ -174,9 +182,27 @@ export default function SolarCalculator() {
                   className="absolute top-[22px] -translate-x-1/2 rounded-md bg-[#0b131f] px-2.5 py-1 text-xs font-semibold text-white"
                   style={{ left: `${percent}%` }}
                 >
-                  {formatInr(bill)}
+                  {formatInr(sliderBill)}
                 </div>
               </div>
+            </div>
+            <div className="mt-7">
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="Enter your amount"
+                disabled={!locationReady}
+                value={locationReady ? bill : ""}
+                onChange={(event) => {
+                  const digits = event.target.value.replace(/\D/g, "");
+                  if (digits === "") {
+                    setBill("");
+                    return;
+                  }
+                  setBill(Math.min(MAX_BILL, Number(digits)));
+                }}
+                className="h-12 w-full rounded-lg border border-line bg-white px-4 text-base text-ink outline-none placeholder:text-slate-400 focus:border-navy disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-muted sm:w-1/2"
+              />
             </div>
           </div>
         </div>
@@ -214,16 +240,16 @@ export default function SolarCalculator() {
 
           <h2 className="mt-8 text-lg font-extrabold text-[#0b131f] sm:text-xl">Your Solar Savings</h2>
           <p className="mt-1 text-center text-sm text-muted">Your savings with HarGharSolar</p>
-          <div className="mt-4 grid grid-cols-3 overflow-hidden rounded-xl border border-line">
+          <div className="mt-4 grid grid-cols-1 overflow-hidden rounded-xl border border-line sm:grid-cols-3">
             <div className="px-3 py-5 text-center">
               <p className="text-lg font-extrabold text-[#0b131f] sm:text-xl">{formatInr(result.monthly)}</p>
               <p className="mt-1 text-sm text-muted">Monthly*</p>
             </div>
-            <div className="border-x border-line px-3 py-5 text-center">
+            <div className="border-t border-line px-3 py-5 text-center sm:border-x sm:border-t-0">
               <p className="text-lg font-extrabold text-[#0b131f] sm:text-xl">{formatInr(result.yearly)}</p>
               <p className="mt-1 text-sm text-muted">Yearly*</p>
             </div>
-            <div className="px-3 py-5 text-center">
+            <div className="border-t border-line px-3 py-5 text-center sm:border-t-0">
               <p className="text-lg font-extrabold text-[#0b131f] sm:text-xl">{formatInr(result.lifetime)}</p>
               <p className="mt-1 text-sm text-muted">Lifetime*</p>
             </div>

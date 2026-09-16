@@ -7,11 +7,37 @@ import { useExpertModal } from "@/components/ExpertModalContext";
 import Logo from "./../../public/images/logo.png";
 import { HARYANA_CITIES, rooftopSolarPath } from "./haryanaCities";
 
+function HomeOfferingIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true" className="shrink-0 text-[#818584]">
+      <path d="M3.5 10.5L11 4l7.5 6.5V18a1 1 0 01-1 1h-4.2v-5.2H8.7V19H4.5a1 1 0 01-1-1v-7.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CommercialOfferingIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true" className="shrink-0 text-[#818584]">
+      <rect x="4" y="3.5" width="14" height="15.5" rx="1.2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M7.5 7h2M12.5 7h2M7.5 10.5h2M12.5 10.5h2M7.5 14h2M12.5 14h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function HousingOfferingIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true" className="shrink-0 text-[#818584]">
+      <path d="M3.5 18.5V8.5L8 5l4.5 3.5v10" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M12.5 10.5h6v8h-6" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M6 11.5h2M6 14.5h2M15 13h2M15 15.5h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 const OFFERINGS = [
-  { label: "Zero investment solar", href: "/zero-investment" },
-  { label: "Guaranteed savings", href: "/guaranted-saving" },
-  // { label: "Hassle-free process", href: "/#why-us" },
-  // { label: "After-sales service", href: "/#why-us" },
+  { label: "Home", href: "/", icon: <HomeOfferingIcon /> },
+  { label: "Commercial", href: "/commercial", icon: <CommercialOfferingIcon /> },
+  { label: "Housing Societies", href: "/housing-societies", icon: <HousingOfferingIcon /> },
 ];
 
 function OnGridIcon() {
@@ -148,8 +174,9 @@ export default function Header() {
                     <a
                       key={item.label}
                       href={item.href}
-                      className="block px-4 py-2 text-sm text-navy hover:bg-sky-soft"
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-navy hover:bg-sky-soft"
                     >
+                      {item.icon}
                       {item.label}
                     </a>
                   ))}
@@ -230,7 +257,7 @@ export default function Header() {
         </div>
 
         {mobileOpen && !isAdmin ? (
-          <div className="border-t border-line bg-white px-4 py-4 lg:hidden">
+          <div className="max-h-[min(70vh,calc(100dvh-3.5rem))] overflow-y-auto border-t border-line bg-white px-4 py-4 sm:max-h-[min(70vh,calc(100dvh-4rem))] md:max-h-[min(70vh,calc(100dvh-72px))] lg:hidden">
             <div className="mx-auto max-w-site space-y-3">
               {[
                 { id: "offerings", label: "Our Offerings", items: OFFERINGS },

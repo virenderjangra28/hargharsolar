@@ -28,9 +28,9 @@ export default function CityHero({ city }) {
 
   return (
     <section className="bg-[#f4f6f8]">
-      <div className="mx-auto grid max-w-site items-start gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.15fr_0.85fr] md:px-8 md:py-14">
+      <div className="mx-auto grid max-w-site items-start gap-8 px-4 py-8 sm:px-6 sm:py-10 md:grid-cols-[1.15fr_0.85fr] md:grid-rows-[auto_auto] md:px-8 md:py-14">
         <div>
-          <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-[#0b131f] sm:text-4xl lg:text-[42px]">
+          <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-[#0b131f] sm:text-4xl lg:text-[42px]">
             Save Big — Go Solar in <span className="text-sky">{city}</span> &amp; Reduce Costs{" "}
             <span className="text-sky">Up to 70%</span>
           </h1>
@@ -41,8 +41,19 @@ export default function CityHero({ city }) {
             Book your free site survey in <span className="font-extrabold text-sky">{city}</span> and
             claim your subsidy now, before it runs out.
           </p>
+        </div>
 
-          <div className="relative mt-8 overflow-hidden rounded-2xl">
+        <div className="relative md:row-span-2">
+          <LeadForm
+            variant="city"
+            title="Book Free Solar Consultation"
+            subtitle=""
+            submitLabel="Book Free Solar Survey"
+          />
+        </div>
+
+        <div>
+          <div className="relative overflow-hidden rounded-2xl">
             <img src={slide.src} alt={`${slide.caption} in ${city}`} className="aspect-[16/10] w-full object-cover" />
             <p className="absolute inset-x-0 bottom-0 bg-black/55 px-4 py-3 text-sm font-medium text-white">
               {slide.caption} in {city}
@@ -61,15 +72,6 @@ export default function CityHero({ city }) {
               />
             ))}
           </div>
-        </div>
-
-        <div className="relative">
-          <LeadForm
-            variant="city"
-            title="Book Free Solar Consultation"
-            subtitle=""
-            submitLabel="Book Free Solar Survey"
-          />
         </div>
       </div>
 

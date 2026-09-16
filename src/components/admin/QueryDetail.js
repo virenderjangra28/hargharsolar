@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { ACTIONS, actionClass, actionLabel, formatDate, StatusBadge } from "./queryFields";
+import { ACTIONS, actionClass, actionLabel, formatDate, StatusBadge, normalizeSource, tableColumns } from "./queryFields";
 
-const DETAIL_FIELDS = [
+const HOME_DETAIL_FIELDS = [
   { key: "name", label: "Name" },
   { key: "mobile", fallback: "phone", label: "WhatsApp" },
   { key: "address", label: "Address" },
@@ -15,7 +15,20 @@ const DETAIL_FIELDS = [
   { key: "selectedTime", fallback: "timeSlot", label: "Time slot" },
 ];
 
-export default function QueryDetail({ request, onClose, setStatus, editable = true }) {
+function detailFields(source) {
+  if (source === "home") return HOME_DETAIL_FIELDS;
+  return [
+    ...tableColumns(source).map((column) => ({
+      key: column.key,
+      label: column.label,
+      format: column.format,
+    })),
+    { key: "mobile", fallback: "phone", label: "WhatsApp" },
+  ].filter((field, index, list) => list.findIndex((item) => item.key === field.key) === index);
+}
+
+export default function QueryDetail({ request, onClose, setStatus, editable = true, source = "home" }) {
+  const leadSource = normalizeSource(source);
   useEffect(() => {
     function onKeyDown(event) {
       if (event.key === "Escape") onClose();
@@ -65,7 +78,7 @@ export default function QueryDetail({ request, onClose, setStatus, editable = tr
 
         <div className="overflow-y-auto px-5 py-4">
           <dl className="divide-y divide-line rounded-xl border border-line">
-            {DETAIL_FIELDS.map((field) => {
+            {detailFields(leadSource).map((field) => {
               const raw = request[field.key] ?? request[field.fallback];
               const value = field.format ? field.format(raw) : raw;
               return (

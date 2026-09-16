@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useExpertModal } from "@/components/ExpertModalContext";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 const ROOF_OPTIONS = [
   {
@@ -68,6 +69,7 @@ function todayIso() {
 
 export default function SavingsQuiz({ lead = {} }) {
   const { openModal } = useExpertModal();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const data = JSON.parse(decodeURIComponent(lead));
   const [step, setStep] = useState(1);
   const [roof, setRoof] = useState("");
@@ -87,6 +89,12 @@ export default function SavingsQuiz({ lead = {} }) {
   const [submitError, setSubmitError] = useState("");
   const progress = step === 1 ? 18 : step === 2 ? 45 : submitted ? 100 : 80;
   const pinCity = PIN_CITIES[visit.pincode];
+  const visitComplete =
+    visit.address.trim().length >= 8 &&
+    visit.landmark.trim().length > 0 &&
+    /^\d{6}$/.test(visit.pincode) &&
+    Boolean(visit.date) &&
+    Boolean(visit.slot);
 
   function updateVisit(field, value) {
     setVisit((prev) => ({ ...prev, [field]: value }));
@@ -110,9 +118,11 @@ export default function SavingsQuiz({ lead = {} }) {
     }
     setVisitErrors(next);
     setSubmitError("");
+    
     if (Object.keys(next).length > 0) return;
 
     try {
+      setIsSubmitting(true);
       const response = await fetch("/api/query", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -129,6 +139,7 @@ export default function SavingsQuiz({ lead = {} }) {
         }),
       });
       const data = await response.json();
+      setIsSubmitting(false);
       if (!response.ok) {
         setSubmitError(data.error || "Could not book the visit. Please try again.");
         return;
@@ -138,6 +149,8 @@ export default function SavingsQuiz({ lead = {} }) {
     } catch {
       setSubmitError("Could not book the visit. Please try again.");
       toast.error("Could not book the visit. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -145,7 +158,7 @@ export default function SavingsQuiz({ lead = {} }) {
     <section className="flex h-full items-center bg-white px-5 py-10 sm:px-8 sm:py-12 md:px-10">
       <div className="w-full max-w-[520px]">
         <h2 className="text-[26px] font-extrabold leading-tight text-navy sm:text-[32px]">
-          Let&apos;s calculate your solar savings
+          <Link href="/solar-calculator">Let&apos;s calculate your solar savings</Link>
         </h2>
         <div className="mt-4 h-[3px] overflow-hidden rounded-full bg-[#e6eef5]">
           <div
@@ -320,9 +333,12 @@ export default function SavingsQuiz({ lead = {} }) {
 
             <button
               type="submit"
-              className="mt-6 h-12 w-full rounded-xl bg-[#8b95a5] text-sm font-semibold text-white transition hover:bg-navy"
+              disabled={isSubmitting}
+              className={`mt-6 h-12 w-full rounded-xl text-sm font-semibold text-white transition ${
+                visitComplete ? "bg-navy hover:bg-navy-mid" : "bg-[#8b95a5]"
+              }`}
             >
-              Submit
+              {isSubmitting ? "Submitting..." : visitComplete ? "Submit" : "Submit"}
             </button>
             <button
               type="button"
