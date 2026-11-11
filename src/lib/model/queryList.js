@@ -26,6 +26,30 @@ const QueryListSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    email: {
+      type: String,
+      default: "",
+    },
+    sanctionLoad: {
+      type: String,
+      default: "",
+    },
+    nationalPortalNo: {
+      type: String,
+      default: "",
+    },
+    geoTaggingPhoto: {
+      type: String,
+      default: "",
+    },
+    electricityBill: {
+      type: String,
+      default: "",
+    },
+    bankDocument: {
+      type: String,
+      default: "",
+    },
     landmark: {
       type: String,
       default: "",
@@ -40,7 +64,7 @@ const QueryListSchema = new mongoose.Schema(
     },
     status : {
         type: String,
-        default: "pending",
+        default: "",
     },
   },
   { collection: "queryLists" },

@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Logo from "../../../public/images/logo.png";
 import { ADMIN_AUTH_KEY, ADMIN_USER } from "@/components/admin/adminUser";
+import UserContext from "@/context/userContext";
+
 
 const INPUT =
   "mt-1.5 h-12 w-full rounded-lg border border-line bg-[#f7f9fc] px-4 text-base text-ink outline-none transition placeholder:text-slate-400 focus:border-sky focus:bg-white";
@@ -14,6 +16,7 @@ export default function LoginScreen() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const context = useContext(UserContext)
 
   function update(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -22,9 +25,9 @@ export default function LoginScreen() {
 
   function validate() {
     const next = {};
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
-      next.email = "Enter a valid email address.";
-    }
+    // if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+    //   next.email = "Enter a valid email address.";
+    // }
     if (!form.password.trim()) {
       next.password = "Enter your password.";
     }
@@ -50,14 +53,24 @@ export default function LoginScreen() {
         return;
       }
 
-      window.sessionStorage.setItem(
-        ADMIN_AUTH_KEY,
-        JSON.stringify({
-          email: data.user?.email || form.email,
-          name: data.user?.name || ADMIN_USER.name,
-          token: data.token,
-        }),
-      );
+      const tempTable = {};
+      tempTable['user'] = data.user?.email;
+      tempTable['name'] = data.user?.name;
+      tempTable['role'] = data.user?.role;
+      tempTable['token'] =  data.token;
+      const base64EncodedData = btoa(unescape(encodeURIComponent(JSON.stringify(tempTable))));
+      localStorage.setItem('sessiondata', base64EncodedData);
+
+      // return tempTable; 
+
+      // window.sessionStorage.setItem(
+      //   ADMIN_AUTH_KEY,
+      //   JSON.stringify({
+      //     email: data.user?.email || form.email,
+      //     name: data.user?.name || ADMIN_USER.name,
+      //     token: data.token,
+      //   }),
+      // );
       router.push("/admin/dashboard");
     } catch (error) {
       setErrors({ form: "Unable to login. Please try again." });

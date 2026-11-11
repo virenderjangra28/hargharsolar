@@ -78,6 +78,8 @@ const MORE = [
   { label: "Solar Calculator", href: "/solar-calculator" },
   { label: "PM Surya Ghar Yojana", href: "/pm-surya-ghar-yojana" },
   { label: "Refer & Earn", href: "/refer-and-earn" },
+  { label: "Add Leads", href: "/leads" },
+  { label: "Login", href: "/login" },
 ];
 
 function Chevron({ open }) {

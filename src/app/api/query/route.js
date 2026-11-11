@@ -20,6 +20,13 @@ export async function POST(request) {
       landmark: body.landmark || "",
       selectedDate: body.selectedDate,
       selectedTime: body.selectedTime,
+      email: body.email,
+      sanctionLoad: body.sanctionLoad,
+      nationalPortalNo: body.nationalPortalNo,
+      geoTaggingPhoto: body.geoTaggingPhoto,
+      electricityBill: body.electricityBill,
+      bankDocument: body.bankDocument,
+      status: body.status
     });
     await queryList.save();
     return NextResponse.json({ success: true, message: "Query submitted successfully" });
@@ -57,9 +64,9 @@ export async function PATCH(request) {
   try {
     await connectDB();
     const { id, status } = await request.json();
-    if (!id || !["pending", "accepted", "rejected"].includes(status)) {
-      return NextResponse.json({ success: false, error: "Invalid id or status" }, { status: 400 });
-    }
+    // if (!id || !["pending", "accepted", "rejected"].includes(status)) {
+    //   return NextResponse.json({ success: false, error: "Invalid id or status" }, { status: 400 });
+    // }
     const updated = await QueryList.findByIdAndUpdate(id, { status }, { new: true });
     if (!updated) {
       return NextResponse.json({ success: false, error: "Query not found" }, { status: 404 });

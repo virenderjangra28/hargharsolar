@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ADMIN_AUTH_KEY, ADMIN_USER } from "./adminUser";
+import UserContext from "@/context/userContext";
 
 const NAV_ITEMS = [
   { href: "/admin/dashboard", label: "Dashboard" },
@@ -71,6 +72,8 @@ export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const user = useContext(UserContext);
+  const name = user
 
   useEffect(() => {
     setOpen(false);
@@ -78,6 +81,7 @@ export default function AdminSidebar() {
 
   async function logout() {
     window.sessionStorage.removeItem(ADMIN_AUTH_KEY);
+    localStorage.removeItem('sessiondata');
     await fetch("/api/logout", { method: "POST" });
     router.push("/login");
   }

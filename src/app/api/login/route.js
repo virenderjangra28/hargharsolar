@@ -28,7 +28,7 @@ export async function POST(request) {
     const response = NextResponse.json({
       success: true,
       token,
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role },
     });
     response.cookies.set("token", token, {
       httpOnly: true,
@@ -36,6 +36,7 @@ export async function POST(request) {
       path: "/",
       maxAge: 60 * 60,
     });
+    
     return response;
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

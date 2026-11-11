@@ -1,7 +1,20 @@
 export const ACTIONS = [
-  { id: "pending", label: "Pending", className: "border-amber-300 bg-amber-50 text-amber-800" },
-  { id: "rejected", label: "Reject", className: "border-red-300 bg-red-50 text-red-700" },
-  { id: "accepted", label: "Accepted", className: "border-green-300 bg-green-50 text-green-700" },
+  { id: "newConnection", label: "New Connection Apply", className: "border-slate-300 bg-slate-50 text-slate-400" },
+  { id: "nameChange", label: "Name Change Applied", className: "border-neutral-300 bg-neutral-50 text-neutral-800" },
+  { id: "loadChange", label: "Load Change Applied", className: "border-violet-300 bg-violet-50 text-violet-500" },
+  { id: "registration", label: "Registration", className: "border-indigo-300 bg-indigo-50 text-indigo-500" },
+  { id: "application", label: "Application Submitted", className: "border-sky-300 bg-sky-50 text-sky-800" },
+  { id: "feasibility", label: "feasibility Report Submitted", className: "border-teal-300 bg-teal-50 text-teal-500" },
+  { id: "Upload Agreement", label: "Upload Agreement", className: "border-lime-300 bg-lime-50 text-lime-500" },
+  { id: "loan_apply", label: "Loan Apply", className: "border-yellow-300 bg-yellow-50 text-yellow-600" },
+  { id: "pending_Bank", label: "Pending from Bank Side", className: "border-orange-300 bg-orange-50 text-orange-400" },
+  { id: "installation", label: "installation", className: "border-red-300 bg-red-50 text-red-400" },
+  { id: "Inspection", label: "Inspection", className: "border-stone-300 bg-stone-50 text-stone-800" },
+  { id: "Project Commissioning", label: "Project Commissioning", className: "border-lime-300 bg-lime-50 text-lime-900" },
+  { id: "netMetering", label: "Net Meter Apply", className: "border-cyan-300 bg-cyan-50 text-cyan-800" },
+  { id: "Subsidy Request", label: "Subsidy Request", className: "border-emerald-300 bg-emerald-50 text-emerald-900" },
+  { id: "Subsidy Disbursal", label: "Subsidy Disbursal", className: "border-amber-300 bg-amber-50 text-amber-800" },
+  { id: "completed", label: "Completed", className: "border-green-300 bg-green-50 text-green-800" },
 ];
 
 export function formatDate(value) {
