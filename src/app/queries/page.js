@@ -6,7 +6,7 @@ export const metadata = {
   description: "Add Leads: Leads are the potential customers for the solar system installation. Add leads to the system to get the leads and convert them into customers.",
 };
 
-export default function AddLeadsPage() {
+export default function QueriesPage() {
   return (
     <div className="min-h-full overflow-x-hidden bg-white">
       <main>

@@ -566,7 +566,7 @@ export default function AddLeadForm({
           className={`w-full rounded-lg py-3.5 text-sm font-semibold text-white transition ${isCity ? "bg-sky uppercase tracking-wide hover:bg-navy" : "bg-navy hover:bg-navy-mid"
             }`}
         >
-          {loading ? "Loading..." : submitLabel ?? "Add Leads"}
+          {loading ? "Loading..." : submitLabel ?? "Add Queries"}
         </button>
       </div>
     </form>

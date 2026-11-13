@@ -8,8 +8,8 @@ export default function AddLeads() {
         <aside className="w-full max-w-4xl">
           <AddLeadForm
             variant="sidebar"
-            title="Add Leads"
-            subtitle="Add leads to your database. No pressure, add only if you are satisfied!"
+            title="Queries"
+            subtitle="Add queries to your database. No pressure, add only if you are satisfied!"
             showSlotsBadge = {false}
           />
         </aside>
