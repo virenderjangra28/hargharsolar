@@ -62,6 +62,14 @@ const QueryListSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    employeeCode: {
+        type: String,
+        default: "",
+    },
+    referBy: {
+        type: String,
+        default: "",
+    },
     status : {
         type: String,
         default: "",

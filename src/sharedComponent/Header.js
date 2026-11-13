@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useExpertModal } from "@/components/ExpertModalContext";
 import Logo from "./../../public/images/logo.png";
 import { HARYANA_CITIES, rooftopSolarPath } from "./haryanaCities";
+import UserContext from "@/context/userContext";
+import { getDashboardRoute } from "@/lib/dashboardRoute";
 
 function HomeOfferingIcon() {
   return (
@@ -79,8 +81,14 @@ const MORE = [
   { label: "PM Surya Ghar Yojana", href: "/pm-surya-ghar-yojana" },
   { label: "Refer & Earn", href: "/refer-and-earn" },
   { label: "Queries", href: "/queries" },
-  { label: "Login", href: "/login" },
 ];
+
+const LOGIN = [
+  { label: "Consumer Login", href: "/consumer/login" },
+  { label: "Vendor Login", href: "/vendor/login" },
+  { label: "Admin Login", href: "/login" }
+];
+
 
 function Chevron({ open }) {
   return (
@@ -133,6 +141,10 @@ export default function Header() {
   const [openMenu, setOpenMenu] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const isAdmin = pathname.startsWith("/admin");
+  const context = useContext(UserContext);
+  const user = context?.user;
+  const dashboardRoute = getDashboardRoute(user?.role);
+  const router = useRouter();
 
   useEffect(() => {
     setOpenMenu(null);
@@ -152,6 +164,15 @@ export default function Header() {
     setOpenMenu(null);
     openModal();
   }
+
+   async function logout() {
+    // window.sessionStorage.removeItem(ADMIN_AUTH_KEY);
+    localStorage.removeItem('sessiondata');
+    await fetch("/api/logout", { method: "POST" });
+    context.logout();
+    router.push("/");
+  }
+
 
   return (
     <>
@@ -226,6 +247,37 @@ export default function Header() {
                     </a>
                   ))}
                 </Dropdown>
+                {user ? (
+                  <Dropdown id="login-menu" label={user.name || "Login"} align="right">
+                    {dashboardRoute ? (
+                      <a
+                        href={dashboardRoute}
+                        className="block px-4 py-2 text-sm text-navy hover:bg-sky-soft"
+                      >
+                        Dashboard
+                      </a>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={logout}
+                      className="w-full text-left px-4 py-2 text-sm text-navy hover:bg-sky-soft"
+                    >
+                      Logout
+                    </button>
+                  </Dropdown>
+                ) : (
+                  <Dropdown id="login-menu" label="Login" align="right">
+                  {LOGIN.map((item) => (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      className="block px-4 py-2 text-sm text-navy hover:bg-sky-soft"
+                    >
+                      {item.label}
+                    </a>
+                  ))}
+                </Dropdown>
+                )}
               </nav>
 
               <div className="flex items-center gap-2">

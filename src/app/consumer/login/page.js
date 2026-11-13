@@ -3,9 +3,10 @@
 import { useContext, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import Logo from "../../../public/images/logo.png";
+import Logo from "../../../../public/images/logo.png";
 import { ADMIN_AUTH_KEY, ADMIN_USER } from "@/components/admin/adminUser";
 import UserContext from "@/context/userContext";
+import { getDashboardRoute } from "@/lib/dashboardRoute";
 
 
 const INPUT =
@@ -17,6 +18,7 @@ export default function LoginScreen() {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const context = useContext(UserContext)
+  const [isLoading, setIsLoading] = useState(false);
 
   function update(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -38,6 +40,7 @@ export default function LoginScreen() {
   async function handleSubmit(event) {
     event.preventDefault();
     if (!validate()) return;
+    setIsLoading(true);
 
     try {
       const response = await fetch("/api/login", {
@@ -48,8 +51,27 @@ export default function LoginScreen() {
         body: JSON.stringify({ email: form.email, password: form.password }),
       });
       const data = await response.json();
+      if(data.user?.role !== "3"){
+        // Handle admin-specific logic
+        if(data.user?.role === "2") {
+          setErrors({ form: "Please login as a vendor." });
+          setIsLoading(false);
+          return;
+        } else if(data.user?.role === "1") {
+          setErrors({ form: "Please login as an admin." });
+          setIsLoading(false);
+          return;
+        }
+      }
       if (!response.ok || !data.success) {
         setErrors({ form: data.error || "Email or password is incorrect." });
+        setIsLoading(false);
+        return;
+      }
+
+      const dashboardRoute = getDashboardRoute(data.user?.role);
+      if (!dashboardRoute) {
+        setErrors({ form: "This account has an unsupported role." });
         return;
       }
 
@@ -60,6 +82,8 @@ export default function LoginScreen() {
       tempTable['token'] =  data.token;
       const base64EncodedData = btoa(unescape(encodeURIComponent(JSON.stringify(tempTable))));
       localStorage.setItem('sessiondata', base64EncodedData);
+      context.login(data.user);
+      setIsLoading(false);
 
       // return tempTable; 
 
@@ -71,7 +95,7 @@ export default function LoginScreen() {
       //     token: data.token,
       //   }),
       // );
-      router.push("/admin/dashboard");
+      router.push(dashboardRoute);
     } catch (error) {
       setErrors({ form: "Unable to login. Please try again." });
     }
@@ -109,7 +133,7 @@ export default function LoginScreen() {
               priority
             />
           </a>
-          <h2 className="mt-6 text-2xl font-extrabold text-navy">Admin login</h2>
+          <h2 className="mt-6 text-2xl font-extrabold text-navy">Consumer login</h2>
           <p className="mt-1 text-sm text-muted">Enter your details to open the request dashboard.</p>
 
           <form className="mt-6" onSubmit={handleSubmit} noValidate>
@@ -156,7 +180,7 @@ export default function LoginScreen() {
               type="submit"
               className="mt-6 h-12 w-full rounded-lg bg-navy text-sm font-semibold text-white transition hover:bg-navy-mid"
             >
-              Login
+              {isLoading ? "Logging in..." : "Login"}
             </button>
           </form>
         </div>

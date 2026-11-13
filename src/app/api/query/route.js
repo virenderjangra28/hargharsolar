@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { QueryList } from "@/lib/model/queryList";
+import { User } from "@/lib/model/user";
 
 export async function POST(request) {
   try {
@@ -26,9 +27,18 @@ export async function POST(request) {
       geoTaggingPhoto: body.geoTaggingPhoto,
       electricityBill: body.electricityBill,
       bankDocument: body.bankDocument,
+      employeeCode: body.employeeCode || "",
+      referBy: body.referBy || "",
       status: body.status
     });
     await queryList.save();
+    const saveQueryAsUser = new User({
+      email: body.mobile,
+      password: body.mobile,
+      name: body.name,
+      role: "3" // Assuming role "3" is for users who submit queries,
+     });
+    await saveQueryAsUser.save();
     return NextResponse.json({ success: true, message: "Query submitted successfully" });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

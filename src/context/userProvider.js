@@ -3,6 +3,11 @@ import React, { useEffect, useState } from "react";
 import UserContext from "./userContext";
 import Cookies from 'js-cookie';
 
+function getStoredSession() {
+  const sessionData = localStorage.getItem("sessiondata");
+  return sessionData ? JSON.parse(atob(sessionData)) : null;
+}
+
 const UserProvider = ({ children }) => {
   const [user, setUser] = useState(undefined);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -10,38 +15,14 @@ const UserProvider = ({ children }) => {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const token = Cookies.get('token');
-        if (token) {
-          const sessionData = localStorage.getItem("sessiondata");
-          if (!sessionData) {
-            // No session data found, clear token and reset state
-            setUser(undefined);
-            setIsAuthenticated(false);
-            Cookies.remove('token');
-            return;
-          }
-
-          try {
-            const base64DecodedData = atob(sessionData);
-            // Validate that decoded data is valid JSON
-            if (!base64DecodedData || base64DecodedData.trim().length === 0) {
-              throw new Error('Decoded session data is empty');
-            }
-            
-            const tempUser = JSON.parse(base64DecodedData);
-            
-            // Validate that required properties exist
-            if (tempUser && tempUser.user) {
-              setUser({ ...tempUser['user']});
-              setIsAuthenticated(true);
-            } else {
-              throw new Error('Invalid session data structure');
-            }
-          } catch (decodeError) {
-            // Base64 decode or JSON parse failed
-            console.error('Error decoding session data:', decodeError);
-            throw decodeError;
-          }
+        const sessionData = getStoredSession();
+        if (sessionData?.token && sessionData.user) {
+          setUser({
+            email: sessionData.user,
+            name: sessionData.name,
+            role: sessionData.role,
+          });
+          setIsAuthenticated(true);
         } else {
           setUser(undefined);
           setIsAuthenticated(false);
@@ -58,26 +39,28 @@ const UserProvider = ({ children }) => {
     fetchUser();
   }, []);
 
-  const login = (userData, token,) => {
+  const login = (userData) => {
     setUser(userData);
+    setIsAuthenticated(true);
   };
 
   const logout = () => {
     setUser(undefined);
-    setPermission([]);
-    setIsSuperAdmin(false);
     setIsAuthenticated(false);
     localStorage.removeItem('sessiondata');
     Cookies.remove('token');
   };
 
   const validateToken = () => {
-    const token = Cookies.get('token');
-    if (!token) {
+    try {
+      if (getStoredSession()?.token) return true;
+      logout();
+      return false;
+    } catch (error) {
+      console.error("Error reading stored session:", error);
       logout();
       return false;
     }
-    return true;
   };
 
   return (
@@ -86,6 +69,7 @@ const UserProvider = ({ children }) => {
       setUser, 
       isAuthenticated, 
       setIsAuthenticated, 
+      login,
       logout,
       validateToken,
     }}>
