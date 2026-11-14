@@ -141,6 +141,8 @@ export default function Header() {
   const [openMenu, setOpenMenu] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const isAdmin = pathname.startsWith("/admin");
+  const isVendor = pathname.startsWith("/vendor");
+  const isConsumer = pathname.startsWith("/consumer");
   const context = useContext(UserContext);
   const user = context?.user;
   const dashboardRoute = getDashboardRoute(user?.role);
@@ -189,7 +191,7 @@ export default function Header() {
             />
           </a>
 
-          {!isAdmin ? (
+          {!isAdmin && !isVendor && !isConsumer ? (
             <div className="ml-auto flex items-center gap-6">
               <nav className="hidden items-center gap-7 lg:flex">
                 <Dropdown id="offerings-menu" label="Our Offerings">
@@ -310,13 +312,14 @@ export default function Header() {
           ) : null}
         </div>
 
-        {mobileOpen && !isAdmin ? (
+        {mobileOpen && !isAdmin && !isVendor && !isConsumer ? (
           <div className="max-h-[min(70vh,calc(100dvh-3.5rem))] overflow-y-auto border-t border-line bg-white px-4 py-4 sm:max-h-[min(70vh,calc(100dvh-4rem))] md:max-h-[min(70vh,calc(100dvh-72px))] lg:hidden">
             <div className="mx-auto max-w-site space-y-3">
               {[
                 { id: "offerings", label: "Our Offerings", items: OFFERINGS },
                 { id: "solutions", label: "Solar Solutions", items: SOLUTIONS },
                 { id: "more", label: "More", items: MORE },
+                { id: "login", label: "Login", items: LOGIN },
               ].map((group) => (
                 <div key={group.id}>
                   <button
