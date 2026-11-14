@@ -19,6 +19,10 @@ const UserSchema = new mongoose.Schema(
     role : {
       type: String,
       required: true,
+    },
+    empID: {
+      type: String,
+      required: false,
     }
   },
   { collection: "users" },

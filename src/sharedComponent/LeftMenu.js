@@ -11,6 +11,21 @@ const NAV_ITEMS = [
   { href: "/admin/commercial", label: "Commercial" },
   { href: "/admin/housing-society", label: "Housing Society" }
 ];
+const NAV_ITEMS_VENDOR = [
+  { href: "/vendor/dashboard", label: "Dashboard" },
+  { href: "/vendor/query", label: "Query" },
+  { href: "/vendor/contact-us", label: "Contact-us" },
+];
+const NAV_ITEMS_CONSUMER = [
+  { href: "/consumer/dashboard", label: "Dashboard" },
+  { href: "/consumer/query", label: "Query" },
+  { href: "/consumer/contact-us", label: "Contact-us" },
+];
+const NAV_ITEMS_BY_ROLE = {
+  1: NAV_ITEMS,
+  2: NAV_ITEMS_VENDOR,
+  3: NAV_ITEMS_CONSUMER,
+};
 
 function initials(name) {
   return name
@@ -27,6 +42,7 @@ export default function LeftMenu() {
   const [open, setOpen] = useState(false);
   const context = useContext(UserContext);
   const user = context?.user || {};
+  const navItems = NAV_ITEMS_BY_ROLE[String(user.role)] || [];
 
   useEffect(() => {
     setOpen(false);
@@ -95,7 +111,7 @@ export default function LeftMenu() {
         </div>
 
         <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const active =
               pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
@@ -145,7 +161,7 @@ export default function LeftMenu() {
           </div>
 
           <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const active =
                 pathname === item.href ||
                 pathname.startsWith(`${item.href}/`);

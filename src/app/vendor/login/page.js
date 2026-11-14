@@ -79,6 +79,7 @@ export default function LoginScreen() {
       tempTable['user'] = data.user?.email;
       tempTable['name'] = data.user?.name;
       tempTable['role'] = data.user?.role;
+      tempTable['empID'] = data.user?.empID;
       tempTable['token'] =  data.token;
       const base64EncodedData = btoa(unescape(encodeURIComponent(JSON.stringify(tempTable))));
       localStorage.setItem('sessiondata', base64EncodedData);
